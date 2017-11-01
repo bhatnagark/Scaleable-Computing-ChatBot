@@ -10,7 +10,9 @@ host=socket.gethostname()
 print(host)
 port=12221
 
-#Defining
+#diconnect function
+def discon():
+	clThread.exit()
 
 #defining chat server as threading thread
 
