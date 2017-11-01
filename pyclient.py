@@ -10,6 +10,15 @@ def connect():
 	conn_msg += "CLIENT_NAME:".encode('utf-8') + Cname.encode('utf-8') + "\n".encode('utf-8')
 	s.send(conn_msg)
     s.send(conn_msg)
+    
+def chat():
+	croom = input('What roo to chat with')
+	chat_message = input('Message')
+	msg = "CHAT: ".encode('utf-8') + croom.encode('utf-8') + "\n".encode('utf-8')
+	msg += "JOIN_ID: ".encode('utf-8') + str(jID).encode('utf-8') + "\n".encode('utf-8')
+	msg += "CLIENT_NAME: ".encode('utf-8') + Cname.encode('utf-8') + "\n".encode('utf-8')
+	msg += "MESSAGE: ".encode('utf-8') + chat_message.encode('utf-8') + "\n\n".encode('utf-8')
+	s.send(msg)    
  
  
 # create a socket object 
@@ -45,9 +54,9 @@ while(1):
 	task = input('?')
 	if task == '1':
 		connect()
-	#elif task == '2':
-	#	print('Chatting')
-	#	chat(s)
+	elif task == '2':
+		print('Chatting')
+		chat(s)
 	#elif task == '3':
 	#	leave(s)
 	#elif task == '4':
