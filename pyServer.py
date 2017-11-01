@@ -1,7 +1,8 @@
 #Python Server for multiple clients
 
 import socket
-import threading
+import threading as Thread
+import random
 
 #creating socket object 
 s=socket.socket()
@@ -9,38 +10,62 @@ host=socket.gethostname()
 print(host)
 port=12221
 
+#Defining
+
 #defining chat server as threading thread
 
-class ChatServer(threading.Thread):
-    #specifyying number of waiting clients
-    MAX_WAITING_CONNECTIONS=10
-    #Size of the message length
-    RECV_BUFFER=4096
-    #Placeholder for message length
-    RECV_MESG_LEN=10
-    
+class client_threads(Thread):
+   
     #Initialize new server
-    def init(self,host,port):
-        threading.thread.init(self)
-        self.host=host
-        self.port=port
-        self.running= TRUE #whether server should run or not
+    def __init__(self,ip,port,socket):
+		Thread.__init__(self)
+		self.ip = ip
+		self.port = port
+		self.chatroom =[] 
+		self.socket = socket
+		self.uid = random.randint(1000,2000)
+		self.roomname = ''
+		self.clientname = ''
+   
+    #Running
+    def run(self):
+		while True:
+			conn_msg = csock.recv(1024)
+			cflag = check_msg(conn_msg)
+			print('Connected')
+			if cflag == 1 :
+				 print('joining')
+				 self.roomname,self.clientname = join(conn_msg,csock)
+			elif cflag == 2 : leave(conn_msg,csock)
+			elif cflag == 3 : discon(csock)
+			elif cflag == 4 : chat()
+			else : pass					 #error code for incorrect message	
+			print(self.clientname)
+			self.chatroom.append(self.roomname)
+			print('roomnames')
+			print(self.chatroom)
     
-    #binds the multi threaded socket with host and port instead of previous single threaded socket    
-    def bind_socket(self):
-        
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM) #IPv4, continuos stream of data flow
-        self.server_socket.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1) # socket option re use the address 
-        self.server_socket.bind((self.host, self.port)) # bind the host name and port
-        self.server_socket.listen(self.MAX_WAITING_CONNECTIONS) 
-        self.connections.append(self.server_socket)
-    
+server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+host = socket.gethostname()
+port = 10001
+server.bind((host,port))
+print(host)
+thread_count = [] 
 
-#threading required
-while 1:
-    c,adrs= s.accept()
-    print("got connceted from %s", +str(adrs))
-    
-    response="welcome to the chatroom"
-    c.send(response.encode('ascii'))
-    c.close()
+g1_clients = []
+g2_clients = []
+
+
+while True:
+	server.listen(4)
+	(csock,(ip,port)) = server.accept()
+
+	print("Connected to ",port,ip)
+	#monitoring connections
+
+	clThread = client_threads(ip,port,csock)
+	clThread.start()
+	thread_count.append(clThread)
+	print("Threads :")
+	print(thread_count)
+	print(g1_clients)
