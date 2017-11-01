@@ -10,6 +10,20 @@ host=socket.gethostname()
 print(host)
 port=12221
 
+#defining chat message 
+def check_msg(msg):
+	print('Checking')
+	if (msg.find('JOIN_CHATROOM'.encode('utf-8'))+1):
+		return(1)	
+	elif (msg.find('LEAVE_CHATROOM'.encode('utf-8'))+1):
+		return(2)
+	elif (msg.find('DISCONNECT'.encode('utf-8'))+1):
+		return(3)
+	elif (msg.find('CHAT:'.encode('utf-8'))+1):
+		return(4)	
+	else:
+		return(5)
+
 #diconnect function
 def discon():
 	clThread.exit()
