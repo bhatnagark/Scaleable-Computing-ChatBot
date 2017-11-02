@@ -55,28 +55,32 @@ def join(conn_msg,csock):
 # leaving the chat room            
 
 def leave(conn_msg,csock):
-	grp_start = conn_msg.find('LEAVE_CHATROOM:'.encode('utf-8')) + 15
-	grp_end = conn_msg.find('\n'.encode('utf-8'), grp_start) - 1
+    print('leaving chat room')
+	grp_start = conn_msg.find('LEAVING_CHATROOM:'.encode('utf-8')) + 17
+	grp_end = conn_msg.find('\n'.encode('utf-8'), grp_start) 
 
 	group_name = conn_msg[grp_start:grp_end]
 
 	response = "LEFT_CHATROOM".encode('utf-8') + groupname + "\n".encode('utf-8')
 	response += "JOIN_ID".encode('utf-8') + str(clThread.uid).encode('utf-8')
-
-	grpmessage = "CLIENT_NAME:".encode('utf-8') + (self.clientname).encode('utf-8') + "\n".encode('utf-8')
-	grpmessage += "CLIENT_ID:".encode('utf-8') + str(self.uid).encode('utf-8') +"\n".encode('utf-8')
+    
+    #sending message to the group
+    
+	grpmessage = "CLIENT_NAME:".encode('utf-8') + (clThread.clientname).encode('utf-8') + "\n".encode('utf-8')
+	grpmessage += "CLIENT_ID:".encode('utf-8') + str(clThread.uid).encode('utf-8') +"\n".encode('utf-8')
 	grpmessage += "LEFT GROUP".encode('utf-8')
-	if group_name == g1:
-		g1_clients.remove(self.clientname)
-		for x in g1_clients:
-			(g1_clients[x].socket).send(chat_text)
-	elif group_name == g2:
-		g2_clients.remove(self.clientname)
-		for x in g2_clients:
-			(g2_clients[x].socket).send(chat_text)
-	csock.send(response)            
+	print(group_name)
+    if(group_name.decode('utf-8')) == 'g1':
+		i=g1_clients.index(clThread.socket)
+		del g1_clients[i]
+	elif(group_name.decode('utf-8')) == 'g2':
+		i=g2_clients.index(clThread.socket)
+        g2_clients.remove(self.clientname)
+        del g2_clients[i]
+		csock.send(response)            
 
-
+    
+     
 #Chat function
 def chat(conn_msg,csock):
 	chat_msg_start = conn_msg.find('Mesage:'.encode('utf-8')) + 9
@@ -99,6 +103,8 @@ def chat(conn_msg,csock):
 		for x in g2_clients:
 			g2_clients[x].send(chat_text)
 
+
+            
 #diconnect function
 
 def discon():
@@ -118,24 +124,53 @@ class client_threads(Thread):
 		self.uid = random.randint(1000,2000)
 		self.roomname = ''
 		self.clientname = ''
+        
+        
    
     #Running
     def run(self):
 		while True:
 			conn_msg = csock.recv(1024)
+            print('Connection message')
+            print(conn_msg)
 			cflag = check_msg(conn_msg)
 			print('Connected')
 			if cflag == 1 :
 				print('joining')
-				self.roomname,self.clientname = join(conn_msg,csock)
+				self.roomname,self.clientname,self.roomID = join(conn_msg,csock)
 			elif cflag == 2 : leave(conn_msg,csock)
-			elif cflag == 3 : discon(csock)
-			elif cflag == 4 : chat()
-			else : pass					
-			print(self.clientname)
+			elif cflag == 3 : return(0)
+			elif cflag == 4 : chat(conn_msg,csock)
+			else : print('Error code.wait for more')					
+			#print(self.clientname)
 			self.chatroom.append(self.roomname)
-			print('roomnames')
-			print(self.chatroom)
+			print('Total in group 1:')
+            print(len(g1_clients))
+            print('total clients in group 2 :')
+			print(len(g2_clients))
+            
+            
+            
+            
+            def run(self):
+                
+		        while True:
+			        conn_msg = csock.recv(1024)
+			  print('CM')
+			print(conn_msg)
+			cflag = check_msg(conn_msg)
+			if cflag == 1 :
+				 self.roomname,self.clientname,self.roomID = join(conn_msg,csock)
+			elif cflag == 2 : leave(conn_msg,csock)
+			elif cflag == 3 : return(0)
+			elif cflag == 4 : chat(conn_msg,csock)
+			else : print('Error code. Wait for more')
+			self.chatroom.append(self.roomname)
+			print('Total clients in group g1: ')
+			print(len(g1_clients))
+			print('Total clients in group g2: ')
+			print(len(g2_clients))
+
 
     
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
