@@ -45,6 +45,22 @@ if p==0:
 serverThread = Client(s)
 serverThread.start()
 
+def leave(s):
+	rTL = input('Which room to leave')
+	msg = "LEAVING_CHATROOM: ".encode('utf-8') + rTL.encode('utf-8') + "\n".encode('utf-8')
+	msg += "JOIN_ID: ".encode('utf-8') + jID.encode('utf-8') + "\n".encode('utf-8')
+	msg += "CLIENT_NAME: ".encode('utf-8') + Cname.encode('utf-8') 	
+	s.send(msg)	
+
+def discon():
+	msg = "DISCONNECTING: \n".encode('utf-8') 
+	msg += "PORT: \n".encode('utf-8')
+	msg += "CLIENT_NAME: ".encode('utf-8') + Cname.encode('utf-8') + "\n".encode('utf-8')
+	s.send(msg)
+	
+	s.close()
+	os._exit(1)
+
 while(1):
 	print('Enter Option to choose:')
 	print('1. Join')
