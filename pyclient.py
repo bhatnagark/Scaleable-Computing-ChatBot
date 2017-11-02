@@ -73,9 +73,9 @@ while(1):
 	elif task == '2':
 		print('Chatting')
 		chat(s)
-	#elif task == '3':
-	#	leave(s)
-	#elif task == '4':
-	#	discon()
-	#elif task == '5':
-	#	print('Error')
+	elif task == '3':
+		leave(s)
+	elif task == '4':
+		discon()
+	elif task == '5':
+		print('Error')
