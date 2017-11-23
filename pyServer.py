@@ -216,7 +216,7 @@ while True:
 	print("Connected to ",port,ip)
 	
     #monitoring connections
-    clThread = client_threads(ip,port,csock)
+     clThread = client_threads(ip,port,csock)
 	clThread.start()
 	thread_count.append(clThread)
 	print("Threads :")
