@@ -121,11 +121,7 @@ def chat(conn_msg,csock):
 			g2_clients[x].send(chat_text)
 
 
-            
-#diconnect function
-
-def discon():
-	clThread.exit()
+        
 
 #defining chat server as threading thread
 
@@ -190,6 +186,18 @@ class client_threads(Thread):
 
 
     
+def resp(msg,socket):
+    msg_start= msg.find('Hello:'.encode('utf-8'))+6
+    msg_end = msg.find('\n'.encode('utf-8'),msg_start)
+
+	chat_msg = msg[msg_start:msg_end]
+
+	response = "Hello: ".encode('utf-8') + chat_msg + "\n".encode('utf-8')
+	response += "IP: ".encode('utf-8') + str(clThread.ip).encode('utf-8') + "\n".encode('utf-8')
+	response += "PORT: ".encode('utf-8') + str(clThread.port).encode('utf-8') + "\n".encode('utf-8')
+	response += "StudentID: ".encode('utf-8') + "17307932".encode('utf-8') + "\n".encode('utf-8')
+
+
 server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 host = socket.gethostname()
 port = int(sys.argv[1])
@@ -206,9 +214,9 @@ while True:
 	(csock,(ip,port)) = server.accept()
 
 	print("Connected to ",port,ip)
-	#monitoring connections
-
-	clThread = client_threads(ip,port,csock)
+	
+    #monitoring connections
+    clThread = client_threads(ip,port,csock)
 	clThread.start()
 	thread_count.append(clThread)
 	print("Threads :")
