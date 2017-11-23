@@ -1,14 +1,16 @@
 #Python Server for multiple clients
 
-import socket
-import threading as Thread
+import socket,sys,os
+from threading as Thread
+from threading import Lock
 import random
 
 
 #defining chat message 
 def check_msg(msg):
 	print('Checking')
-	if (msg.find('JOIN_CHATROOM'.encode('utf-8'))+1):
+	
+    if (msg.find('JOIN_CHATROOM'.encode('utf-8'))+1):
 		return(1)	
 	elif (msg.find('LEAVE_CHATROOM'.encode('utf-8'))+1):
 		return(2)
@@ -16,10 +18,13 @@ def check_msg(msg):
 		return(3)
 	elif (msg.find('CHAT:'.encode('utf-8'))+1):
 		return(4)	
-	else:
-		return(5)
+	elif (msg.find('Kill_Service'.encode('utf-8'))+1):
+        return(5)
+    else:
+		return(6)
     
 #Join function
+
 def join(conn_msg,csock):
 	#print('Joiner')
 	gname = conn_msg.find('Joining_chatroom:'.encode('utf-8'))+17
@@ -31,25 +36,37 @@ def join(conn_msg,csock):
 	clientname = conn_msg[cname:cname_end]
 	rID = 0
 	
-	if (groupname.decode('utf-8')) == 'g1' :
-		print('g1')
+	if (groupname.decode('utf-8')) == 'room1' :
+		print('room1')
         g1_clients.append(clThread.socket)
 		rID = 1001
-	elif groupname == 'g2' :
-        print('g2')
+	elif groupname == 'room2' :
+        print('room-2')
 		g2_clients.append(clThread.socket)
 		rID = 1002
         
         
 	#sending ackowledgement
 	response = "JOINED_CHATROOM: ".encode('utf-8') + groupname+ "\n".encode('utf-8')
-	response += "SERVER_IP: \n".encode('utf-8')
-	response += "PORT: \n".encode('utf-8')
+	response += "SERVER_IP:".encode('utf-8') + host.encode('utf-8') + "\n".encode('utf-8')
+	response += "PORT:".encode('utf-8') + str(port).encode('utf-8') + "\n".encode('utf-8')
 	response += "ROOM_REF: ".encode('utf-8') + str(rID).encode('utf-8') +'\n'.encode('utf-8')
 	response += "JOIN_ID: ".encode('utf-8') + str(clThread.uid).encode('utf-8') + "\n.encode('utf-8)"  
-
-	csock.send(response)
-	return groupname,clientname  
+    csock.send(response)
+	grpmessage = "CHAT:".encode('utf-8') + str(rID).encode('utf-8') + "\n".encode('utf-8')
+	grpmessage += "CLIENT_NAME:".encode('utf-8') + clientname + "\n".encode('utf-8') 
+	grpmessage += "MESSAGE:".encode('utf-8') + clientname + "\n".encode('utf-8') 
+	grpmessage += "CLIENT_ID:".encode('utf-8') + str(clThread.uid).encode('utf-8') +"\n".encode('utf-8')
+	grpmessage += "JOINED_GROUP".encode('utf-8') +"\n".encode('utf-8')
+	if (groupname.decode('utf-8')) == 'room1':
+		for x in range(len(g1_clients)):
+			g1_clients[x].send(grpmessage)
+	elif (groupname.decode('utf-8')) == 'room2':
+		for x in range(len(g2_clients)):
+			g2_clients[x].send(grpmessage)
+	threadLock.release()
+    
+    return groupname,clientname  
 
 
 # leaving the chat room            
