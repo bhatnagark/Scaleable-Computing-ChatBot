@@ -5,6 +5,10 @@ from threading as Thread
 from threading import Lock
 import random
 
+threadLock = Lock()
+
+roomList = []
+
 
 #defining chat message 
 def check_msg(msg):
@@ -87,10 +91,10 @@ def leave(conn_msg,csock):
 	grpmessage += "CLIENT_ID:".encode('utf-8') + str(clThread.uid).encode('utf-8') +"\n".encode('utf-8')
 	grpmessage += "LEFT GROUP".encode('utf-8')
 	print(group_name)
-    if(group_name.decode('utf-8')) == 'g1':
+    if(group_name.decode('utf-8')) == 'room1':
 		i=g1_clients.index(clThread.socket)
 		del g1_clients[i]
-	elif(group_name.decode('utf-8')) == 'g2':
+	elif(group_name.decode('utf-8')) == 'room2':
 		i=g2_clients.index(clThread.socket)
         g2_clients.remove(self.clientname)
         del g2_clients[i]
